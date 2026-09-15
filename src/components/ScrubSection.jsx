@@ -24,6 +24,7 @@ export default function ScrubSection({
   const titleRef = useRef(null)
   const keywordRef = useRef(null)
   const bgRef = useRef(null)
+  const sweepRef = useRef(null)
   const reduced = useReducedMotion()
   const isMobile = useIsMobile()
   const near = useNearViewport(sectionRef, '150% 0px')
@@ -73,15 +74,25 @@ export default function ScrubSection({
               keywordRef.current.style.transform = `translateY(${(0.5 - p) * 40}px)`
             }
 
+            if (sweepRef.current) {
+              const sweepDuration = 0.3
+              const sweepP = Math.min(1, p / sweepDuration)
+              sweepRef.current.style.top = sweepP * 100 + '%'
+              sweepRef.current.style.opacity = p <= 0 ? 0 : String(Math.sin(Math.PI * sweepP))
+            }
+
             if (p > 0.82 && !last) {
               section.classList.add('is-exiting')
               const exitP = (p - 0.82) / 0.18
               if (bgRef.current) {
-                bgRef.current.style.filter = `brightness(${1 - exitP * 0.5}) saturate(${1 - exitP})`
+                bgRef.current.style.filter =
+                  `brightness(${1 - exitP * 0.4}) saturate(${1 - exitP * 0.7}) ` +
+                  `drop-shadow(${exitP * 5}px 0 0 rgba(255,45,85,.4)) ` +
+                  `drop-shadow(${-exitP * 5}px 0 0 rgba(0,220,255,.4))`
               }
               if (titleRef.current) {
                 titleRef.current.style.opacity = String(1 - exitP)
-                titleRef.current.style.transform = `translateX(${exitP * (Math.random() > 0.5 ? 12 : -12)}px)`
+                titleRef.current.style.transform = `translateX(${Math.sin(p * 300) * exitP * 10}px)`
               }
             } else {
               section.classList.remove('is-exiting')
@@ -133,8 +144,10 @@ export default function ScrubSection({
             {near && <source src={videoSrc} />}
           </video>
         )}
+        <div className="section__sweep" ref={sweepRef} aria-hidden="true" />
       </div>
       <div className="section__scrim" />
+      <div className="section__vignette" />
       <div className="section__keyword" ref={keywordRef} aria-hidden="true">
         {keyword}
       </div>

@@ -1,21 +1,21 @@
 import ScrubSection from '../components/ScrubSection'
 
-export default function Signature() {
+export default function Signature({ total }) {
   return (
     <ScrubSection
       id="signature"
-      index={8}
-      total={8}
+      index={total}
+      total={total}
       eyebrow="Scan complet"
       title="LAND CRUISER"
       keyword="100%"
-      videoSrc="/video/signature.mp4"
+      videoSrc="/video/hero-alt.mp4"
       transition="converge"
       last
     >
       <p className="section__lead">
-        Toutes les couches relevées. Le véhicule se reconstitue, intact — prêt pour le terrain
-        qu’il vient de révéler.
+        Châssis, moteur — toutes les couches relevées. Le véhicule se reconstitue, intact,
+        sous le même œil qui vient de le mettre à nu.
       </p>
       <div className="section__lead" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
         <a className="cta" href="#" style={{ gridColumn: 'unset' }}>Configurer</a>

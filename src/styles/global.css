@@ -78,7 +78,9 @@ a { color: inherit; }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.55;
+  opacity: 0.6;
+  filter: contrast(1.1) saturate(1.08) brightness(0.94);
+  transition: filter 0.4s ease;
 }
 
 .section__scrim {
@@ -86,6 +88,28 @@ a { color: inherit; }
   inset: 0;
   z-index: 1;
   background: linear-gradient(180deg, rgba(10,13,16,0.75) 0%, rgba(10,13,16,0.35) 30%, rgba(10,13,16,0.55) 75%, rgba(10,13,16,0.9) 100%);
+}
+
+.section__vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, transparent 45%, rgba(10, 13, 16, 0.7) 100%);
+}
+
+.section__sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent 5%, var(--c-scan) 50%, transparent 95%);
+  box-shadow: 0 0 24px 4px var(--c-scan-dim);
+  opacity: 0;
+  will-change: transform, opacity;
 }
 
 .section__keyword {
@@ -363,6 +387,19 @@ a { color: inherit; }
 .hud__reticle::before { top: 50%; left: -8px; width: 6px; height: 1px; }
 .hud__reticle::after { top: 50%; right: -8px; width: 6px; height: 1px; }
 
+.hud__reticle-pulse {
+  position: absolute;
+  inset: -6px;
+  border: 1px solid var(--c-scan);
+  border-radius: 50%;
+  animation: reticle-pulse 2.6s ease-out infinite;
+}
+
+@keyframes reticle-pulse {
+  0% { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
 .hud__radar {
   position: absolute;
   top: var(--hud-inset);
@@ -387,10 +424,25 @@ a { color: inherit; }
 
 .hud__ticks {
   position: absolute;
-  top: var(--hud-inset);
-  bottom: var(--hud-inset);
-  left: 0;
-  width: 1px;
+  left: calc(var(--hud-inset) + 40px);
+  right: calc(var(--hud-inset) + var(--gauge-width) + 40px);
+  height: 8px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--c-scan) 0,
+    var(--c-scan) 1px,
+    transparent 1px,
+    transparent 24px
+  );
+  opacity: 0.5;
+  mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+}
+
+.hud__ticks--top { top: var(--hud-inset); }
+.hud__ticks--bottom { bottom: var(--hud-inset); }
+
+@media (max-width: 760px) {
+  .hud__ticks { display: none; }
 }
 
 /* ---------- custom cursor ---------- */
@@ -405,24 +457,138 @@ a { color: inherit; }
   height: 22px;
   transform: translate(-50%, -50%);
   will-change: transform;
+  transition: width 0.25s ease, height 0.25s ease;
+}
+
+.cursor.is-hovering {
+  width: 40px;
+  height: 40px;
 }
 
 .cursor__h, .cursor__v {
   position: absolute;
   background: var(--c-scan);
+  transition: background 0.25s ease;
 }
 
 .cursor__h { top: 50%; left: 0; width: 100%; height: 1px; }
 .cursor__v { top: 0; left: 50%; width: 1px; height: 100%; }
 
+.cursor__ring {
+  position: absolute;
+  inset: -3px;
+  border: 1px solid var(--c-scan);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.cursor.is-hovering .cursor__ring {
+  opacity: 0.6;
+  transform: scale(1);
+}
+
 .cursor__coords {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 14px;
+  left: 14px;
   font-family: var(--font-mono);
   font-size: 0.6rem;
   color: var(--c-scan);
   white-space: nowrap;
+}
+
+/* ---------- film grain ---------- */
+
+.grain {
+  position: fixed;
+  inset: -20%;
+  z-index: 45;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  animation: grain-shift 1.4s steps(4) infinite;
+}
+
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-4%, 3%); }
+  50% { transform: translate(3%, -4%); }
+  75% { transform: translate(-3%, -3%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---------- section nav ---------- */
+
+.section-nav {
+  position: fixed;
+  right: calc(var(--gauge-width) + 22px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+@media (max-width: 760px) {
+  .section-nav { right: calc(40px + 14px); gap: 12px; }
+}
+
+@media (max-width: 700px) {
+  .section-nav { display: none; }
+}
+
+.section-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: var(--c-text-dim);
+}
+
+.section-nav__label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+}
+
+.section-nav__item:hover .section-nav__label,
+.section-nav__item:focus-visible .section-nav__label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.section-nav__dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-panel-border);
+  border: 1px solid var(--c-scan-dim);
+  transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+  flex-shrink: 0;
+}
+
+.section-nav__item.active .section-nav__dot {
+  background: var(--c-scan);
+  box-shadow: 0 0 10px 2px var(--c-scan-dim);
+  transform: scale(1.6);
+}
+
+.section-nav__item:focus-visible {
+  outline: 1px solid var(--c-scan);
+  outline-offset: 3px;
 }
 
 /* ---------- loader ---------- */
@@ -452,6 +618,7 @@ a { color: inherit; }
   left: 0; top: 0; bottom: 0;
   background: var(--c-scan);
   width: 0%;
+  transition: width 0.15s linear;
 }
 
 .loader__pct {
@@ -460,25 +627,18 @@ a { color: inherit; }
   color: var(--c-scan);
 }
 
+.loader__status {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--c-text-dim);
+  letter-spacing: 0.08em;
+  height: 1em;
+}
+
 /* ---------- transitions per section ---------- */
 
-.section--wireframe .section__bg { filter: brightness(1) hue-rotate(0deg); }
-.section--wireframe.is-exiting .section__bg {
-  filter: brightness(0.6) saturate(0) contrast(1.4);
-  outline: 1px solid var(--c-scan);
-}
-
-.section--wipe {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
-}
-
-.flash {
-  position: fixed;
-  inset: 0;
-  background: #fff;
-  z-index: 90;
-  opacity: 0;
-  pointer-events: none;
+.section.is-exiting .section__keyword {
+  transition: opacity 0.2s ease;
 }
 
 /* ---------- CTA ---------- */

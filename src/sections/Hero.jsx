@@ -1,11 +1,11 @@
 import ScrubSection from '../components/ScrubSection'
 
-export default function Hero() {
+export default function Hero({ total }) {
   return (
     <ScrubSection
       id="hero"
       index={1}
-      total={8}
+      total={total}
       eyebrow="Scan initialisé"
       title="ANATOMY"
       keyword="SCAN"

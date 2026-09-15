@@ -1,8 +1,4 @@
 import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 
 export default function ScanGauge() {
   const fillRef = useRef(null)
@@ -10,19 +6,31 @@ export default function ScanGauge() {
   const pctRef = useRef(null)
 
   useEffect(() => {
-    const st = ScrollTrigger.create({
-      trigger: document.body,
-      start: 'top top',
-      end: 'bottom bottom',
-      onUpdate: (self) => {
-        const pct = self.progress * 100
-        if (fillRef.current) fillRef.current.style.height = pct + '%'
-        if (markerRef.current) markerRef.current.style.bottom = pct + '%'
-        if (pctRef.current) pctRef.current.textContent = String(Math.round(pct)).padStart(3, '0')
-      },
-    })
+    let raf = null
 
-    return () => st.kill()
+    const update = () => {
+      raf = null
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      const pct = max > 0 ? Math.min(100, Math.max(0, (window.scrollY / max) * 100)) : 0
+
+      if (fillRef.current) fillRef.current.style.height = pct + '%'
+      if (markerRef.current) markerRef.current.style.bottom = pct + '%'
+      if (pctRef.current) pctRef.current.textContent = String(Math.round(pct)).padStart(3, '0')
+    }
+
+    const onScroll = () => {
+      if (raf === null) raf = requestAnimationFrame(update)
+    }
+
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (raf !== null) cancelAnimationFrame(raf)
+    }
   }, [])
 
   return (

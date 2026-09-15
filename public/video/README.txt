@@ -1,17 +1,20 @@
-8 Flow (Veo) clips, muted looping mp4 (or webm), named:
+4 clips power the site, all re-encoded 1280x720 / CRF 26 / faststart / no audio:
 
-hero.mp4        -> plan 1, reveal carrosserie              [present]
-chassis.mp4     -> plan 2, chassis transparence             [present]
-engine.mp4      -> plan 3, groupe motopropulseur            [present]
-4x4.mp4         -> plan 4, transmission / suspension        [missing]
-cabin.mp4       -> plan 5, habitacle                        [missing]
-terrain.mp4     -> plan 6, franchissement                   [missing]
-wheel.mp4       -> plan 7, roue / pneu (Technologie section) [missing]
-signature.mp4   -> plan 8, signature finale                 [missing]
+hero.mp4        -> plan 1, reveal carrosserie (HERO section)
+chassis.mp4     -> plan 2, chassis transparence (CHÂSSIS section)
+engine.mp4      -> plan 3, groupe motopropulseur (MOTEUR section)
+hero-alt.mp4    -> second studio take, reused for the SIGNATURE section (car fully
+                   reconstituted -- same shot type as hero.mp4, different generation)
 
-hero-alt.mp4 is a second take of the hero shot, kept but unused -- swap it in for hero.mp4
-if it reads better.
+Each has a matching .jpg poster frame (first frame of the encode), shown instantly while
+the video streams in.
 
-Optional poster frames: same name with .jpg extension (e.g. hero.jpg), used while the
-video loads. The site renders correctly without any of these files -- each missing section
-falls back to its scan-line gradient background and giant keyword watermark.
+To re-encode a new raw export the same way:
+  ffmpeg -i raw.mp4 -vf "scale=1280:-2" -c:v libx264 -preset slow -crf 26 \
+    -pix_fmt yuv420p -an -movflags +faststart out.mp4
+  ffmpeg -i out.mp4 -vf "select=eq(n\,0)" -vframes 1 -q:v 4 out.jpg
+
+The 4x4, cabin, terrain and technologie sections from the original brief were dropped
+(no footage was generated for them) -- the site is now a tighter 4-section arc: hero,
+châssis, moteur, signature. Re-add a section by pairing a clip here with an entry in
+src/data/sections.js if more footage shows up later.
