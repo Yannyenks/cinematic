@@ -24,6 +24,7 @@ export default function ScrubSection({
   const titleRef = useRef(null)
   const bgRef = useRef(null)
   const sweepRef = useRef(null)
+  const lastVideoTimeRef = useRef(-1)
   const reduced = useReducedMotion()
   const isMobile = useIsMobile()
   const nearViewport = useNearViewport(sectionRef, '150% 0px')
@@ -65,7 +66,14 @@ export default function ScrubSection({
             const p = self.progress
 
             if (video && video.duration) {
-              video.currentTime = p * video.duration
+              const targetTime = p * video.duration
+              // The clip is encoded at 24fps (~0.042s/frame) -- seeking more
+              // often than that just re-decodes a frame that looks identical,
+              // so skip sets below one frame's worth of movement.
+              if (Math.abs(targetTime - lastVideoTimeRef.current) >= 0.04) {
+                video.currentTime = targetTime
+                lastVideoTimeRef.current = targetTime
+              }
             }
 
             titleTl.progress(Math.min(1, p / 0.22))
