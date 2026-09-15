@@ -8,7 +8,6 @@ export default function Signature({ total }) {
       total={total}
       eyebrow="Scan complet"
       title="LAND CRUISER"
-      keyword="100%"
       videoSrc="/video/hero-alt.mp4"
       transition="converge"
       last

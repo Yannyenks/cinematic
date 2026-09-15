@@ -8,9 +8,9 @@ export default function Hero({ total }) {
       total={total}
       eyebrow="Scan initialisé"
       title="ANATOMY"
-      keyword="SCAN"
       videoSrc="/video/hero.mp4"
       transition="dissolve"
+      eager
     >
       <p className="section__lead">
         Land Cruiser. Décelé couche par couche — carrosserie, châssis, groupe motopropulseur,

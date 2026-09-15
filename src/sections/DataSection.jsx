@@ -10,7 +10,6 @@ export default function DataSection({ data, index, total }) {
       total={total}
       eyebrow={data.eyebrow}
       title={data.title}
-      keyword={data.keyword}
       videoSrc={data.video}
       transition={data.transition}
     >

@@ -13,21 +13,21 @@ export default function ScrubSection({
   total,
   eyebrow,
   title,
-  keyword,
   videoSrc,
   transition = 'dissolve',
   last = false,
+  eager = false,
   children,
 }) {
   const sectionRef = useRef(null)
   const videoRef = useRef(null)
   const titleRef = useRef(null)
-  const keywordRef = useRef(null)
   const bgRef = useRef(null)
   const sweepRef = useRef(null)
   const reduced = useReducedMotion()
   const isMobile = useIsMobile()
-  const near = useNearViewport(sectionRef, '150% 0px')
+  const nearViewport = useNearViewport(sectionRef, '150% 0px')
+  const near = eager || nearViewport
 
   useEffect(() => {
     const section = sectionRef.current
@@ -69,10 +69,6 @@ export default function ScrubSection({
             }
 
             titleTl.progress(Math.min(1, p / 0.22))
-
-            if (keywordRef.current) {
-              keywordRef.current.style.transform = `translateY(${(0.5 - p) * 40}px)`
-            }
 
             if (sweepRef.current) {
               const sweepDuration = 0.3
@@ -138,7 +134,7 @@ export default function ScrubSection({
             ref={videoRef}
             muted
             playsInline
-            preload="none"
+            preload={eager ? 'auto' : 'none'}
             poster={videoSrc.replace(/\.(webm|mp4)$/, '.jpg')}
           >
             {near && <source src={videoSrc} />}
@@ -148,9 +144,6 @@ export default function ScrubSection({
       </div>
       <div className="section__scrim" />
       <div className="section__vignette" />
-      <div className="section__keyword" ref={keywordRef} aria-hidden="true">
-        {keyword}
-      </div>
       <div className="section__index mono">
         {String(index).padStart(2, '0')} / {String(total).padStart(2, '0')}
       </div>
