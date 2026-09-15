@@ -3,6 +3,7 @@ import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { splitChars } from '../lib/splitChars'
 import { useReducedMotion, useIsMobile } from '../lib/useReducedMotion'
+import { useNearViewport } from '../lib/useNearViewport'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -25,6 +26,7 @@ export default function ScrubSection({
   const bgRef = useRef(null)
   const reduced = useReducedMotion()
   const isMobile = useIsMobile()
+  const near = useNearViewport(sectionRef, '150% 0px')
 
   useEffect(() => {
     const section = sectionRef.current
@@ -108,6 +110,10 @@ export default function ScrubSection({
     return () => ctx.revert()
   }, [reduced, isMobile])
 
+  useEffect(() => {
+    if (near && videoRef.current) videoRef.current.load()
+  }, [near])
+
   return (
     <section
       id={id}
@@ -121,10 +127,10 @@ export default function ScrubSection({
             ref={videoRef}
             muted
             playsInline
-            preload="metadata"
+            preload="none"
             poster={videoSrc.replace(/\.(webm|mp4)$/, '.jpg')}
           >
-            <source src={videoSrc} />
+            {near && <source src={videoSrc} />}
           </video>
         )}
       </div>
