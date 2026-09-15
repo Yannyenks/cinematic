@@ -1,0 +1,19 @@
+:root {
+  --c-bg: #0A0D10;
+  --c-text: #E8EBED;
+  --c-text-dim: #8B8F94;
+  --c-scan: #3FA9C7;
+  --c-scan-dim: rgba(63, 169, 199, 0.25);
+  --c-thermal: #B5652D;
+  --c-panel: #1C2226;
+  --c-panel-border: rgba(232, 235, 237, 0.12);
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --font-body: 'Inter', sans-serif;
+
+  --gauge-width: 64px;
+  --hud-inset: 24px;
+
+  color-scheme: dark;
+}
